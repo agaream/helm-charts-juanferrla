@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flask
+  namespace: devops
+spec:
+  project: default
+  destinations:
+    namespace: apps
+    server: https://kubernetes.default.svc
+  source:
+    path: flask
+    repoURL: https://github.com/juanferrla/helm-charts.git
+    targetRevision: HEAD # Si quieres usar un tag en lugar de HEAD, ajusta targetRevision
+    helm:
+      valueFiles:
+        - values.yaml
+      parameters:
+        - name: replicaCount
+          value: "3"
+        - name: image.tag
+          value: 5.0.0
+  syncPolicy:
+    automated:
+      prune: false        # Elimina recursos no declarados en el repositorio
+      selfHeal: false      # Repara automáticamente desviaciones
+    syncOptions:
+      - CreateNamespace=true      # Crea automáticamente el namespace si no existe
+
+
